@@ -11,6 +11,9 @@ const OUTPUT_XLSX = path.join(process.cwd(), 'faaltarin-details.xlsx');
 // For 4 vCPU/8 GB, 6–8 concurrent pages is reasonable; default 6.
 const CONCURRENCY = Number(process.env.CONCURRENCY || 6);
 const HEADLESS = 'new';
+const LAUNCH_ARGS = (process.env.PUPPETEER_ARGS || '--no-sandbox --disable-setuid-sandbox')
+  .split(' ')
+  .filter(Boolean);
 const WAIT_OPTIONS = { waitUntil: 'domcontentloaded' };
 
 const blockedTypes = new Set(['image', 'media', 'font', 'stylesheet']);
@@ -169,7 +172,7 @@ async function main() {
 
   console.log(`Processing ${slice.length} shops with concurrency ${CONCURRENCY}`);
 
-  const browser = await puppeteer.launch({ headless: HEADLESS });
+  const browser = await puppeteer.launch({ headless: HEADLESS, args: LAUNCH_ARGS });
 
   const results = await withPool(slice, CONCURRENCY, async (item, index) => {
     const page = await browser.newPage();

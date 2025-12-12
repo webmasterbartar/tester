@@ -5,6 +5,9 @@ const puppeteer = require('puppeteer');
 const LINKS_PATH = path.join(process.cwd(), 'faaltarin-links.json');
 const OUTPUT_PATH = path.join(process.cwd(), 'faaltarin-ads.json');
 const HEADLESS = 'new';
+const LAUNCH_ARGS = (process.env.PUPPETEER_ARGS || '--no-sandbox --disable-setuid-sandbox')
+  .split(' ')
+  .filter(Boolean);
 const WAIT_OPTIONS = { waitUntil: 'domcontentloaded' };
 
 /** Sleep helper to be gentle with the site */
@@ -80,7 +83,7 @@ async function main() {
   }
 
   const links = JSON.parse(fs.readFileSync(LINKS_PATH, 'utf8'));
-  const browser = await puppeteer.launch({ headless: HEADLESS });
+  const browser = await puppeteer.launch({ headless: HEADLESS, args: LAUNCH_ARGS });
   const all = [];
 
   for (const [index, link] of links.entries()) {
